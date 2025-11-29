@@ -1,9 +1,8 @@
 {
   "version": 2,
   "functions": {
-    "api/**.js": {
-    "api/**/*.js": {
-      "runtime": "nodejs24.x"     
+    "api": {
+      "runtime": "nodejs24.x"
     }
   }
 }

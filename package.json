@@ -6,7 +6,8 @@
     "node": "24.x"
   },
   "scripts": {
-    "start": "node api/order.js"
+    "start": "node api/order.js",
+    "dev": "node api/order.js"
   },
   "dependencies": {
     "mongoose": "^8.0.0"

@@ -1,8 +1,12 @@
 {
   "version": 2,
   "functions": {
+<<<<<<< HEAD
     "api/**.js": {
-      "runtime": "nodejs24.x"
+=======
+    "api/**/*.js": {
+>>>>>>> 83fcceca4d250ffb951f92dea281504da4df91ac
+      "runtime": "nodejs24.x"     
     }
   }
 }

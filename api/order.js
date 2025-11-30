@@ -1,7 +1,10 @@
+import express from "express";
 import { connect } from "./db.js";
 import Order from "../models/Order.js";
 
-function mapInput(body) {
+const router = express.Router();
+
+function mapOrder(body) {
     return {
         orderId: body.numeroPedido,
         value: body.valorTotal,
@@ -14,52 +17,41 @@ function mapInput(body) {
     };
 }
 
-export default async function handler(req, res) {
+router.post("/criar", async (req, res) => {
     await connect();
+    const data = mapOrder(req.body);
+    const order = await Order.create(data);
+    res.status(201).json(order);
+});
 
-    const { method } = req;
-    const { id } = req.query;
+router.get("/listar", async (req, res) => {
+    await connect();
+    const orders = await Order.find();
+    res.json(orders);
+});
 
-    // Criar pedido
-    if (method === "POST") {
-        try {
-            const data = mapInput(req.body);
-            const order = await Order.create(data);
-            return res.status(201).json(order);
-        } catch (err) {
-            return res.status(400).json({ error: err.message });
-        }
-    }
+router.get("/buscar/:id", async (req, res) => {
+    await connect();
+    const order = await Order.findOne({ orderId: req.params.id });
+    if (!order) return res.status(404).json({ erro: "Pedido não encontrado" });
+    res.json(order);
+});
 
-    // Listar todos
-    if (method === "GET" && !id) {
-        const list = await Order.find();
-        return res.json(list);
-    }
+router.put("/atualizar/:id", async (req, res) => {
+    await connect();
+    const data = mapOrder(req.body);
+    const updated = await Order.findOneAndUpdate(
+        { orderId: req.params.id },
+        data,
+        { new: true }
+    );
+    res.json(updated);
+});
 
-    // Obter 1 pedido
-    if (method === "GET" && id) {
-        const order = await Order.findOne({ orderId: id });
-        if (!order) return res.status(404).json({ error: "Pedido não encontrado" });
-        return res.json(order);
-    }
+router.delete("/deletar/:id", async (req, res) => {
+    await connect();
+    await Order.deleteOne({ orderId: req.params.id });
+    res.json({ msg: "Pedido deletado" });
+});
 
-    // Atualizar
-    if (method === "PUT" && id) {
-        const data = mapInput(req.body);
-        const updated = await Order.findOneAndUpdate(
-            { orderId: id },
-            data,
-            { new: true }
-        );
-        return res.json(updated);
-    }
-
-    // Delete
-    if (method === "DELETE" && id) {
-        await Order.deleteOne({ orderId: id });
-        return res.json({ message: "Pedido deletado" });
-    }
-
-    return res.status(405).json({ error: "Método não permitido" });
-}
+export default router;

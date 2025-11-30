@@ -7,8 +7,9 @@ import itemRoutes from "./itens.js";
 const app = express();
 app.use(express.json());
 
-
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use("/docs", swaggerUi.serve);
+app.get("/docs", swaggerUi.setup(swaggerDocument));
+//app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/order", orderRoutes);
 app.use("/itens", itemRoutes);
 

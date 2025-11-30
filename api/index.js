@@ -1,37 +1,29 @@
 import express from "express";
 import swaggerUi from "swagger-ui-express";
-import serveStatic from "serve-static";
-import path from "path";
-import { fileURLToPath } from "url";
 import { swaggerDocument } from "./swagger.js";
-import orderRoutes from "./order.js";
-import itemRoutes from "./itens.js";
 
 const app = express();
 app.use(express.json());
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Swagger CDN
+const swaggerOptions = {
+    customCssUrl: "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css",
+    customJs: [
+        "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-standalone-preset.min.js"
+    ]
+};
 
-const swaggerAssets = path.join(
-    __dirname,
-    "../node_modules/swagger-ui-dist"
-);
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerOptions));
 
-app.use("/swagger-ui-dist", serveStatic(swaggerAssets));
-
-app.get(
-    "/docs",
-    swaggerUi.setup(swaggerDocument, {
-        customCssUrl: "/swagger-ui-dist/swagger-ui.css",
-        customJs: "/swagger-ui-dist/swagger-ui-bundle.js",
-        customfavIcon: "/swagger-ui-dist/favicon-32x32.png"
-    })
-);
+// Rotas
+import orderRoutes from "./order.js";
+import itemRoutes from "./itens.js";
 
 app.use("/order", orderRoutes);
 app.use("/itens", itemRoutes);
 
+// Redirect raiz
 app.get("/", (req, res) => {
     res.redirect("/docs");
 });

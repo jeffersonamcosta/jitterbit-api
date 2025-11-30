@@ -1,83 +1,113 @@
+// api/swagger.js
 export const swaggerDocument = {
     openapi: "3.0.0",
     info: {
-        title: "Jitterbit API",
-        version: "1.0.0",
-        description: "API de Pedidos e Itens com CRUD completo."
+        title: "JEFFERSON COSTA _ Jitterbit - Teste Teórico IE PS - v2",
+        version: "30.11.25",
+        description: "API para gerenciar pedidos e itens."
     },
     servers: [
-        {
-            url: "http://localhost:3000",
-            description: "Ambiente local"
-        },
-        {
-            url: "https://jitterbit-api.vercel.app/",
-            description: "Vercel"
-        }
+        { url: "http://localhost:3000", description: "Local" },
+        { url: "https://jitterbit-api.vercel.app/", description: "Produção (Vercel)" }
     ],
-
     components: {
         schemas: {
             Item: {
                 type: "object",
+                required: ["productId", "quantity", "price"],
                 properties: {
-                    productId: { type: "number" },
-                    quantity: { type: "number" },
-                    price: { type: "number" }
+                    _id: { type: "string", readOnly: true, description: "ID do MongoDB (apenas na resposta)" },
+                    productId: { type: "integer", example: 2434, description: "Identificador do produto (numérico)" },
+                    quantity: { type: "integer", example: 1, description: "Quantidade do item" },
+                    price: { type: "number", example: 1000, description: "Preço unitário do item" }
+                },
+                example: {
+                    _id: "64daba7d05bcc674899dc5bf",
+                    productId: 2434,
+                    quantity: 1,
+                    price: 1000
                 }
             },
-            OrderItem: {
-                type: "object",
-                properties: {
-                    idItem: { type: "string" },
-                    quantidadeItem: { type: "number" },
-                    valorItem: { type: "number" }
-                }
-            },
+
             Order: {
                 type: "object",
+                required: ["orderId", "value", "creationDate", "items"],
                 properties: {
-                    numeroPedido: { type: "string" },
-                    valorTotal: { type: "number" },
-                    dataCriacao: { type: "string", format: "date-time" },
+                    _id: { type: "string", readOnly: true, description: "ID do MongoDB (apenas na resposta)" },
+                    orderId: { type: "string", example: "v10089016vdb-01", description: "Identificador do pedido (string única)" },
+                    value: { type: "number", example: 10000, description: "Valor total do pedido" },
+                    creationDate: { type: "string", format: "date-time", example: "2023-07-19T12:24:11.529Z", description: "Data de criação (ISO 8601)" },
                     items: {
                         type: "array",
-                        items: { $ref: "#/components/schemas/OrderItem" }
+                        items: { $ref: "#/components/schemas/Item" },
+                        description: "Lista de itens do pedido"
                     }
+                },
+                example: {
+                    _id: "64dab8a0f6b7183237d307f6",
+                    orderId: "v10089016vdb-01",
+                    value: 10000,
+                    creationDate: "2023-07-19T12:24:11.529Z",
+                    items: [
+                        {
+                            _id: "64daba7d05bcc674899dc5bf",
+                            productId: 2434,
+                            quantity: 1,
+                            price: 1000
+                        }
+                    ]
+                }
+            },
+
+            // Response wrappers
+            SuccessMsg: {
+                type: "object",
+                properties: {
+                    msg: { type: "string", example: "Operação realizada com sucesso" }
+                }
+            },
+            ErrorMsg: {
+                type: "object",
+                properties: {
+                    error: { type: "string", example: "Descrição do erro" }
                 }
             }
         }
     },
 
     paths: {
-
+        /***** ITENS *****/
         "/itens/criar": {
             post: {
-                summary: "Criar item",
                 tags: ["Itens"],
+                summary: "Criar item",
                 requestBody: {
                     required: true,
                     content: {
                         "application/json": {
-                            schema: { $ref: "#/components/schemas/Item" }
+                            schema: { $ref: "#/components/schemas/Item" },
+                            example: { productId: 1001, quantity: 10, price: 3500 }
                         }
                     }
                 },
                 responses: {
-                    201: {
-                        description: "Item criado"
-                    }
+                    "201": {
+                        description: "Item criado",
+                        content: { "application/json": { schema: { $ref: "#/components/schemas/Item" } } }
+                    },
+                    "400": { description: "Requisição inválida", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
                 }
             }
         },
 
         "/itens/listar": {
             get: {
-                summary: "Listar itens",
                 tags: ["Itens"],
+                summary: "Listar todos os itens",
                 responses: {
-                    200: {
-                        description: "Lista de itens"
+                    "200": {
+                        description: "Lista de itens",
+                        content: { "application/json": { schema: { type: "array", items: { $ref: "#/components/schemas/Item" } } } }
                     }
                 }
             }
@@ -85,132 +115,131 @@ export const swaggerDocument = {
 
         "/itens/buscar/{id}": {
             get: {
-                summary: "Buscar item por ID",
                 tags: ["Itens"],
+                summary: "Buscar item por ID (Mongo _id)",
                 parameters: [
-                    {
-                        name: "id",
-                        in: "path",
-                        required: true
-                    }
+                    { name: "id", in: "path", required: true, schema: { type: "string" }, description: "ID do item (Mongo ObjectId)" }
                 ],
                 responses: {
-                    200: {
-                        description: "Item encontrado"
-                    },
-                    404: {
-                        description: "Item não encontrado"
-                    }
+                    "200": { description: "Item encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/Item" } } } },
+                    "404": { description: "Item não encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
                 }
             }
         },
 
         "/itens/atualizar/{id}": {
             put: {
-                summary: "Atualizar item",
                 tags: ["Itens"],
+                summary: "Atualizar item por ID (Mongo _id)",
                 parameters: [
-                    { name: "id", in: "path", required: true }
+                    { name: "id", in: "path", required: true, schema: { type: "string" }, description: "ID do item (Mongo ObjectId)" }
                 ],
                 requestBody: {
                     required: true,
-                    content: {
-                        "application/json": {
-                            schema: { $ref: "#/components/schemas/Item" }
-                        }
-                    }
+                    content: { "application/json": { schema: { $ref: "#/components/schemas/Item" } } }
                 },
                 responses: {
-                    200: { description: "Item atualizado" }
+                    "200": { description: "Item atualizado", content: { "application/json": { schema: { $ref: "#/components/schemas/Item" } } } },
+                    "404": { description: "Item não encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
                 }
             }
         },
 
         "/itens/deletar/{id}": {
             delete: {
-                summary: "Deletar item",
                 tags: ["Itens"],
+                summary: "Deletar item por ID (Mongo _id)",
                 parameters: [
-                    { name: "id", in: "path", required: true }
+                    { name: "id", in: "path", required: true, schema: { type: "string" }, description: "ID do item (Mongo ObjectId)" }
                 ],
                 responses: {
-                    200: { description: "Item deletado" }
+                    "200": { description: "Item deletado", content: { "application/json": { schema: { $ref: "#/components/schemas/SuccessMsg" } } } },
+                    "404": { description: "Item não encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
                 }
             }
         },
 
+        /***** ORDERS *****/
         "/order/criar": {
             post: {
-                summary: "Criar pedido",
                 tags: ["Pedidos"],
+                summary: "Criar pedido",
                 requestBody: {
                     required: true,
                     content: {
                         "application/json": {
-                            schema: { $ref: "#/components/schemas/Order" }
+                            schema: { $ref: "#/components/schemas/Order" },
+                            example: {
+                                orderId: "v10089016vdb-01",
+                                value: 10000,
+                                creationDate: "2023-07-19T12:24:11.529Z",
+                                items: [{ productId: 2434, quantity: 1, price: 1000 }]
+                            }
                         }
                     }
                 },
                 responses: {
-                    201: { description: "Pedido criado com sucesso" }
+                    "201": { description: "Pedido criado", content: { "application/json": { schema: { $ref: "#/components/schemas/Order" } } } },
+                    "400": { description: "Requisição inválida", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
                 }
             }
         },
 
         "/order/listar": {
             get: {
-                summary: "Listar pedidos",
                 tags: ["Pedidos"],
+                summary: "Listar todos os pedidos",
                 responses: {
-                    200: { description: "Lista de pedidos" }
+                    "200": {
+                        description: "Lista de pedidos",
+                        content: { "application/json": { schema: { type: "array", items: { $ref: "#/components/schemas/Order" } } } }
+                    }
                 }
             }
         },
 
         "/order/buscar/{id}": {
             get: {
-                summary: "Buscar pedido por ID",
                 tags: ["Pedidos"],
+                summary: "Buscar pedido por orderId (campo orderId)",
                 parameters: [
-                    { name: "id", in: "path", required: true }
+                    { name: "id", in: "path", required: true, schema: { type: "string" }, description: "orderId (ex: v10089016vdb-01)" }
                 ],
                 responses: {
-                    200: { description: "Pedido encontrado" },
-                    404: { description: "Pedido não encontrado" }
+                    "200": { description: "Pedido encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/Order" } } } },
+                    "404": { description: "Pedido não encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
                 }
             }
         },
 
         "/order/atualizar/{id}": {
             put: {
-                summary: "Atualizar pedido",
                 tags: ["Pedidos"],
+                summary: "Atualizar pedido por orderId (campo orderId)",
                 parameters: [
-                    { name: "id", in: "path", required: true }
+                    { name: "id", in: "path", required: true, schema: { type: "string" }, description: "orderId (ex: v10089016vdb-01)" }
                 ],
                 requestBody: {
                     required: true,
-                    content: {
-                        "application/json": {
-                            schema: { $ref: "#/components/schemas/Order" }
-                        }
-                    }
+                    content: { "application/json": { schema: { $ref: "#/components/schemas/Order" } } }
                 },
                 responses: {
-                    200: { description: "Pedido atualizado" }
+                    "200": { description: "Pedido atualizado", content: { "application/json": { schema: { $ref: "#/components/schemas/Order" } } } },
+                    "404": { description: "Pedido não encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
                 }
             }
         },
 
         "/order/deletar/{id}": {
             delete: {
-                summary: "Deletar pedido",
                 tags: ["Pedidos"],
+                summary: "Deletar pedido por orderId (campo orderId)",
                 parameters: [
-                    { name: "id", in: "path", required: true }
+                    { name: "id", in: "path", required: true, schema: { type: "string" }, description: "orderId (ex: v10089016vdb-01)" }
                 ],
                 responses: {
-                    200: { description: "Pedido deletado" }
+                    "200": { description: "Pedido deletado", content: { "application/json": { schema: { $ref: "#/components/schemas/SuccessMsg" } } } },
+                    "404": { description: "Pedido não encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
                 }
             }
         }

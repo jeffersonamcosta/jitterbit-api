@@ -1,5 +1,8 @@
 import express from "express";
 import swaggerUi from "swagger-ui-express";
+import serveStatic from "serve-static";
+import path from "path";
+import { fileURLToPath } from "url";
 import { swaggerDocument } from "./swagger.js";
 import orderRoutes from "./order.js";
 import itemRoutes from "./itens.js";
@@ -7,11 +10,31 @@ import itemRoutes from "./itens.js";
 const app = express();
 app.use(express.json());
 
-//app.use("/docs", swaggerUi.serve);
-//app.get("/docs", swaggerUi.setup(swaggerDocument));
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const swaggerAssets = path.join(
+    __dirname,
+    "../node_modules/swagger-ui-dist"
+);
+
+
+app.use("/swagger-ui", serveStatic(swaggerAssets));
+
+
+app.get(
+    "/docs",
+    swaggerUi.setup(swaggerDocument, {
+        customCssUrl: "/swagger-ui/swagger-ui.css",
+        customJs: "/swagger-ui/swagger-ui-bundle.js"
+    })
+);
+
+
 app.use("/order", orderRoutes);
 app.use("/itens", itemRoutes);
+
 
 app.get("/", (req, res) => {
     res.redirect("/docs");

@@ -11,8 +11,8 @@ export const swaggerDocument = {
             description: "Ambiente local"
         },
         {
-            url: "https://seu-projeto.vercel.app",
-            description: "Produção (Vercel)"
+            url: "https://jitterbit-api.vercel.app/",
+            description: "Vercel"
         }
     ],
 

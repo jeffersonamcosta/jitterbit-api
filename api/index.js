@@ -13,7 +13,7 @@ app.use("/order", orderRoutes);
 app.use("/itens", itemRoutes);
 
 app.get("/", (req, res) => {
-    res.send("API Jitterbit – visite /docs");
+    res.redirect("/docs");
 });
 
 export default app;

@@ -2,13 +2,13 @@
 export const swaggerDocument = {
     openapi: "3.0.0",
     info: {
-        title: "JEFFERSON COSTA _ Jitterbit - Teste Teórico IE PS - v2",
+        title: "JEFFERSON COSTA _ Jitterbit - Teste Teorico IE PS - v2",
         version: "30.11.25",
         description: "API para gerenciar pedidos e itens."
     },
     servers: [
         { url: "http://localhost:3000", description: "Local" },
-        { url: "https://jitterbit-api.vercel.app/", description: "Produção (Vercel)" }
+        { url: "https://jitterbit-api.vercel.app/", description: "Producao (Vercel)" }
     ],
     components: {
         schemas: {
@@ -17,9 +17,9 @@ export const swaggerDocument = {
                 required: ["productId", "quantity", "price"],
                 properties: {
                     _id: { type: "string", readOnly: true, description: "ID do MongoDB (apenas na resposta)" },
-                    productId: { type: "integer", example: 2434, description: "Identificador do produto (numérico)" },
+                    productId: { type: "integer", example: 2434, description: "Identificador do produto (numerico)" },
                     quantity: { type: "integer", example: 1, description: "Quantidade do item" },
-                    price: { type: "number", example: 1000, description: "Preço unitário do item" }
+                    price: { type: "number", example: 1000, description: "Preco unitario do item" }
                 },
                 example: {
                     _id: "64daba7d05bcc674899dc5bf",
@@ -34,9 +34,9 @@ export const swaggerDocument = {
                 required: ["orderId", "value", "creationDate", "items"],
                 properties: {
                     _id: { type: "string", readOnly: true, description: "ID do MongoDB (apenas na resposta)" },
-                    orderId: { type: "string", example: "v10089016vdb-01", description: "Identificador do pedido (string única)" },
+                    orderId: { type: "string", example: "v10089016vdb-01", description: "Identificador do pedido (string unica)" },
                     value: { type: "number", example: 10000, description: "Valor total do pedido" },
-                    creationDate: { type: "string", format: "date-time", example: "2023-07-19T12:24:11.529Z", description: "Data de criação (ISO 8601)" },
+                    creationDate: { type: "string", format: "date-time", example: "2023-07-19T12:24:11.529Z", description: "Data de criacao (ISO 8601)" },
                     items: {
                         type: "array",
                         items: { $ref: "#/components/schemas/Item" },
@@ -63,13 +63,13 @@ export const swaggerDocument = {
             SuccessMsg: {
                 type: "object",
                 properties: {
-                    msg: { type: "string", example: "Operação realizada com sucesso" }
+                    msg: { type: "string", example: "Operacao realizada com sucesso" }
                 }
             },
             ErrorMsg: {
                 type: "object",
                 properties: {
-                    error: { type: "string", example: "Descrição do erro" }
+                    error: { type: "string", example: "Descricao do erro" }
                 }
             }
         }
@@ -95,7 +95,7 @@ export const swaggerDocument = {
                         description: "Item criado",
                         content: { "application/json": { schema: { $ref: "#/components/schemas/Item" } } }
                     },
-                    "400": { description: "Requisição inválida", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
+                    "400": { description: "Requisicao invalida", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
                 }
             }
         },
@@ -122,7 +122,7 @@ export const swaggerDocument = {
                 ],
                 responses: {
                     "200": { description: "Item encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/Item" } } } },
-                    "404": { description: "Item não encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
+                    "404": { description: "Item nao encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
                 }
             }
         },
@@ -140,7 +140,7 @@ export const swaggerDocument = {
                 },
                 responses: {
                     "200": { description: "Item atualizado", content: { "application/json": { schema: { $ref: "#/components/schemas/Item" } } } },
-                    "404": { description: "Item não encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
+                    "404": { description: "Item nao encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
                 }
             }
         },
@@ -154,7 +154,7 @@ export const swaggerDocument = {
                 ],
                 responses: {
                     "200": { description: "Item deletado", content: { "application/json": { schema: { $ref: "#/components/schemas/SuccessMsg" } } } },
-                    "404": { description: "Item não encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
+                    "404": { description: "Item nao encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
                 }
             }
         },
@@ -180,7 +180,7 @@ export const swaggerDocument = {
                 },
                 responses: {
                     "201": { description: "Pedido criado", content: { "application/json": { schema: { $ref: "#/components/schemas/Order" } } } },
-                    "400": { description: "Requisição inválida", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
+                    "400": { description: "Requisicao invalida", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
                 }
             }
         },
@@ -207,7 +207,7 @@ export const swaggerDocument = {
                 ],
                 responses: {
                     "200": { description: "Pedido encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/Order" } } } },
-                    "404": { description: "Pedido não encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
+                    "404": { description: "Pedido nao encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
                 }
             }
         },
@@ -225,7 +225,7 @@ export const swaggerDocument = {
                 },
                 responses: {
                     "200": { description: "Pedido atualizado", content: { "application/json": { schema: { $ref: "#/components/schemas/Order" } } } },
-                    "404": { description: "Pedido não encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
+                    "404": { description: "Pedido nao encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
                 }
             }
         },
@@ -239,7 +239,7 @@ export const swaggerDocument = {
                 ],
                 responses: {
                     "200": { description: "Pedido deletado", content: { "application/json": { schema: { $ref: "#/components/schemas/SuccessMsg" } } } },
-                    "404": { description: "Pedido não encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
+                    "404": { description: "Pedido nao encontrado", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorMsg" } } } }
                 }
             }
         }
